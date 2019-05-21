@@ -1,0 +1,2 @@
+GET by people picker field
+/_api/web/lists/getbytitle('Tasks')/items?$select=AssignedTo/Name&$filter=AssignedTo/Name eq 'i:0#.w|domain\username'&$expand=AssignedTo
