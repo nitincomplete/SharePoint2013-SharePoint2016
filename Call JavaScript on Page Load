@@ -1,0 +1,14 @@
+//Below works perfect on any SharePoint 2013/2016 page.
+
+(function() {
+
+	// Ensure that both the DOM and the Object Model are ready for us
+	document.addEventListener('DOMContentLoaded', function() {
+		
+    EnsureScriptFunc('sp.js', 'SP.ClientContext', function() {
+			//your JS code here
+		});
+	
+  });
+  
+})();
