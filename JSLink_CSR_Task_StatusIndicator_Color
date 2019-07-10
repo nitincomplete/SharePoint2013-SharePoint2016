@@ -1,0 +1,161 @@
+// List View – Priority Color Sample 
+ 
+(function () { 
+ 
+    // Create object that have the context information about the field that we want to change it's output render  
+    var overrideCurrentContext = {}; 
+    overrideCurrentContext.Templates = {}; 
+    //overrideCurrentContext.OnPreRender = preTaskFormRenderer;
+    overrideCurrentContext.Templates.Fields = { 
+        //'LinkTitle': 
+        //{
+        //	'View': TitleField
+        //},
+        'Indicator': 
+        {
+            "View": StatusIndicator,
+            "DisplayForm": StatusIndicator
+        },
+    }; 
+ 
+    SPClientTemplates.TemplateManager.RegisterTemplateOverrides(overrideCurrentContext); 
+ 
+})(); 
+
+function preTaskFormRenderer(overrideCurrentContext) {
+   modifyHeaderData(overrideCurrentContext);       
+}
+
+//Change Field Name on Header
+function modifyHeaderData(overrideCurrentContext)
+{
+	var arrayLength= overrideCurrentContext.ListSchema.Field.length;
+    for (var i=0; i < arrayLength; i++)
+    {
+       if(overrideCurrentContext.ListSchema.Field[i].DisplayName == 'Indicator')
+         {
+           var newTitle= "Color";
+           var linkTitleField = overrideCurrentContext.ListSchema.Field[i];
+           linkTitleField.DisplayName = newTitle;
+         }
+     };
+}
+ 
+// This function provides the rendering logic for list view 
+function StatusIndicator(ctx) { 
+    var today = new Date();
+    var color = ctx.CurrentItem[ctx.CurrentFieldSchema.Name];
+    
+    var status = ctx.CurrentItem["Status"];
+    var strStart = ctx.CurrentItem["StartDate"];
+    var start = new Date(strStart);
+    var strDue = ctx.CurrentItem["DueDate"];
+    var due = new Date(strDue);
+    var PercentComplete = ctx.CurrentItem["PercentComplete"];
+    PercentComplete = PercentComplete.replace(/\D/g,'');
+    var complete = parseInt(PercentComplete);
+    
+    //console.log("Status: "+status);
+    //console.log("Start: "+start);
+    console.log("Due: "+due);
+    console.log("Completion : "+complete);
+    
+    var html = "No Track";
+	// Return html element with appropriate color based on priority value
+    if(status == "Deferred")
+    {
+        html = "<span style='background-color : black; text-align: center;' title='Deferred/Cancelled'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+    }
+    else if (status == "Waiting on someone else")
+    {
+        html = "<span style='background-color : orange; text-align: center;' title='Awaiting Others'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+    }
+    else if ((status == "Completed") || (complete == 100) )
+    {
+        html = "<span style='background-color : blue; text-align: center;' title='Completed'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+    }
+    else if (complete != 100)
+    {
+        if( (due == "") || (due == "Invalid Date") )
+        {
+            if(start < today)
+                html = "<span style='background-color : yellow; text-align: center;' title='At Risk, Started, No DueDate'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+            else
+                html = "<span style='background-color : grey; text-align: center;' title='No DueDate or StartDate'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+        }
+        else if(due < today)
+        {
+            html = "<span style='background-color : red; text-align: center;' title='Overdue'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+        }
+        else{
+            var DueInDays = date_diff_indays(due, today);
+            //console.log("DueInDays: " + DueInDays);
+            if(DueInDays <= 15)
+            {
+                if((start <= today) && (complete >= 50))
+                    html = "<span style='background-color : green; text-align: center;' title='On Track, Started, Due within 15 days, Completion: >=50%'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else if((start <= today) && (complete < 50))
+                    html = "<span style='background-color : red; text-align: center;' title='Off Track, Started, Due within 15 days, Completion: <50%'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else
+                    html = "<span style='background-color : grey; text-align: center;' title='Not Started, Due within 15 days'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+            }
+            else if(DueInDays <= 30)
+            {
+                if((start <= today) && (complete >= 50))
+                    html = "<span style='background-color : green; text-align: center;' title='On Track, Started, Due within 30 days, Completion: >=50%.'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else if((start <= today) && (complete < 50))
+                    html = "<span style='background-color : yellow; text-align: center;' title='At Risk, Started, Due within 30 days, Completion: <50%.'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else
+                    html = "<span style='background-color : grey; text-align: center;' title='Not Started, Due within 30 days'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+            }
+            else{
+                if((start <= today) && (complete > 0))
+                    html = "<span style='background-color : green; text-align: center;' title='On Track, Started, Due after 30 days, Completion: >0%'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else if((start <= today) && (complete == 0))
+                    html = "<span style='background-color : yellow; text-align: center;' title='At Risk, Started, Due after 30 days, Completion: 0%'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+                else
+                    html = "<span style='background-color : grey; text-align: center;' title='Not Started, Due after 30 days'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+            }
+        }
+    }
+    else
+    {
+        html = "<span style='background-color : grey; text-align: center; title='Not Started'>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
+    }
+    
+    /*
+    switch (color) { 
+        case "Red": 
+            html = "<span style='background-color : red; text-align: center;' title='Off Track'>&nbsp;&nbsp;&nbsp;&nbsp;</span> "; 
+            break; 
+        case "Yellow": 
+            html = "<span style='background-color : yellow; text-align: center;' title='At Risk'>&nbsp;&nbsp;&nbsp;&nbsp;</span> "; 
+            break; 
+        case "Green": 
+            html = "<span style='background-color : green; text-align: center;' title='On Track'>&nbsp;&nbsp;&nbsp;&nbsp;</span> "; 
+            break;
+        case "Grey": 
+            html = "<span style='background-color : grey; text-align: center;' title='Not Started'>&nbsp;&nbsp;&nbsp;&nbsp;</span> "; 
+            break;
+        case "Blue": 
+            html = "<span style='background-color : blue; text-align: center;' title='Completed'>&nbsp;&nbsp;&nbsp;&nbsp;</span> ";
+            break;
+        case "Orange": 
+            html = "<span style='background-color : orange; text-align: center;' title='Awaiting Others'>&nbsp;&nbsp;&nbsp;&nbsp;</span> "; 
+            break;
+        case "Black": 
+            html = "<span style='background-color : black; text-align: center;' title='Deferred/Cancelled'>&nbsp;&nbsp;&nbsp;&nbsp;</span> ";
+            break;
+        default: 
+        	html = "<span style='background-color : grey; text-align: center;' title='No Tracking Info Available'>&nbsp;&nbsp;&nbsp;&nbsp;</span> ";
+        	break;
+    }
+    */
+    return html;
+}
+
+var date_diff_indays = function(date2, date1) {
+    dt1 = new Date(date1);
+    dt2 = new Date(date2);
+    return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+}
