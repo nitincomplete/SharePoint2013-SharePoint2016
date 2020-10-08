@@ -14,10 +14,11 @@ OR you may use a Browser (Google Chrome) to fire below REST query (make changes 
 
 Copy that xml into a local .xml file without general <xml version="1.0"> tag
 
-Add below line into that .xml file at the top
+Add below line into that TrendingTags.xml file at the top
 <?xml-stylesheet type="text/xsl" href="trendingtags.xsl" ?>
 
 Save below "trendingtags.xsl" file at the same location/folder
+Then open TrendingTags.xml via Browser (IE) as ...\SharePoint 2013-2016\Trending Tags\TrendingTags.xml
 
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices">
