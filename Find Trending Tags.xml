@@ -1,0 +1,44 @@
+Search Query (REST API)
+
+Finding Top 20 trending tags via search:
+
+1.Download the SharePoint 2013 search query tool : http://sp2013searchtool.codeplex.com/
+2.Set Connection String and authentication info. (You can run this tool anywhere since it uses CSOM)
+3.Enter the following query text. Modify date/time to desired. (the webpart shows the last 7 days)a. ContentTypeId:0x01FD* write>="2015-07-01 00:00:00Z"
+4.Add the following to the Refiners box. By default we show up to 20, most to least popular. Tags(filter=20/0/*,sort=frequency/descending)
+5.Click the run button and view the results
+6.The refinement tab will show the tags. The “Refinement Name” and “Refinement Value” show the actual tag. There is a GUID in front of it.
+
+OR you may use a Browser (Google Chrome) to fire below REST query (make changes accordingly)
+<https://localhost>/_api/search/query?querytext=%27ContentTypeId:0x01FD*+write>%3d"2020-01-01+00:00:00Z"%27&rowsperpage=0&rowlimit=20&refiners=%27Tags(filter%3d20%2f0%2f*%2csort%3dfrequency%2fdescending)%27&clienttype=%27ContentSearchRegular%27
+
+Copy that xml into a local .xml file without general <xml version="1.0"> tag
+
+Add below line into that .xml file at the top
+<?xml-stylesheet type="text/xsl" href="trendingtags.xsl" ?>
+
+Save below "trendingtags.xsl" file at the same location/folder
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices">
+<xsl:output method="xml" indent="yes" encoding="utf-8" omit-xml-declaration="no" />
+<xsl:template match="/">
+  <html>
+  <body>
+  <h2>Trending Tags</h2>
+    <table border="1">
+      <tr bgcolor="#9acd32">
+        <th>Tags</th>
+		<th>Count</th>
+      </tr>
+      <xsl:for-each select="d:query/d:PrimaryQueryResult/d:RefinementResults/d:Refiners/d:element/d:Entries/d:element">
+      <tr>
+        <td><xsl:value-of select="substring-after(substring-after(d:RefinementName, '|'), '|')"/></td>
+		<td><xsl:value-of select="d:RefinementCount"/></td>
+      </tr>
+      </xsl:for-each>
+    </table>
+  </body>
+  </html>
+</xsl:template>
+</xsl:stylesheet>
