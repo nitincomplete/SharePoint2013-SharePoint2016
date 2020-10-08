@@ -12,14 +12,16 @@ Finding Top 20 trending tags via search:
 OR you may use a Browser (Google Chrome) to fire below REST query (make changes accordingly)
 <https://localhost>/_api/search/query?querytext=%27ContentTypeId:0x01FD*+write>%3d"2020-01-01+00:00:00Z"%27&rowsperpage=0&rowlimit=20&refiners=%27Tags(filter%3d20%2f0%2f*%2csort%3dfrequency%2fdescending)%27&clienttype=%27ContentSearchRegular%27
 
-Copy that xml into a local .xml file without general <xml version="1.0"> tag
+Copy that xml into a local TrendingTags.xml file without general <xml version="1.0"> tag
 
 Add below line into that TrendingTags.xml file at the top
 <?xml-stylesheet type="text/xsl" href="trendingtags.xsl" ?>
 
 Save below "trendingtags.xsl" file at the same location/folder
-Then open TrendingTags.xml via Browser (IE) as ...\SharePoint 2013-2016\Trending Tags\TrendingTags.xml
+Then open TrendingTags.xml via Browser (IE) as ...\SharePoint 2013-2016\Trending Tags\TrendingTags.xml	
+Done
 
+<trendingtags.xsl>
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices">
 <xsl:output method="xml" indent="yes" encoding="utf-8" omit-xml-declaration="no" />
