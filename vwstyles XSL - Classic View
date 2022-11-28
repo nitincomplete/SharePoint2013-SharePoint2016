@@ -1,0 +1,6 @@
+Issue: 
+  SharePoint fields like Title, Created and Modified are not showing data correctly after changing from Modern to classic.
+Analysis: 
+  vwstyles.xsl was missing from C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\16\layouts could be the issue
+Resolution:
+  replaced vsstyles.xsl and the issue seems to have resolved
